@@ -25,9 +25,8 @@ def create_variables():
 
 
 # Load data
-X = np.load('Data/inputX.npy')
-Y = np.load('Label/inputY.npy')
-indices = range(10)
+X = np.load('Input/inputX.npy')
+Y = np.load('Label/inputy.npy')
 
 data_train_valid, data_test, label_train_valid, label_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 data_train, data_valid, label_train, label_valid = train_test_split(data_train_valid, label_train_valid, test_size=0.3,
@@ -78,7 +77,7 @@ if not os.path.isfile(os.path.join(os.getcwd(),"Model/RNN/RNN.ckpt.meta")):
             if step % DISPLAY_EPOCH == 0:
                 loss_valid, predict_valid, acc_valid = session.run([loss, logits, acc], feed_dict={tf_train_data: data_valid,
                                                                                    tf_train_label: label_valid})
-                print acc_train[0]
+                print (acc_train[0])
                 #cc = np.corrcoef(predict_valid, label_valid)
                 print ("step %d, train : loss is %g" % (step, l))
                 print ("step %d, validation : loss is %g"%(step, loss_valid))
