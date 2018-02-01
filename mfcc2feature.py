@@ -71,10 +71,11 @@ def upSampling(feature, rate):
 if __name__ == "__main__":
     for arg in sys.argv[1:]:
         a = np.asarray(extractSpeechData(arg))
-        b = np.empty([1, ])
+        b = np.empty([30, ])
         for n in range(1, len(a[0])):
-            c = np.reshape(normalize(upSampling(a[:, n], rate)), (30,))
+            c = upSampling(a[:, n], rate)
             b = np.column_stack((b, c))
+        b = normalize(b, axis=0)
         np.save(arg, b[:, 1:])
 
 
