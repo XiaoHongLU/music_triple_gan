@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import sys
+from sklearn.preprocessing import normalize
 
 rate = 100
 
@@ -64,16 +65,6 @@ def upSampling(feature, rate):
     upsampled_x = pd_x.interpolate(method='cubic')
     upsampled_x = upsampled_x.as_matrix().reshape([np.shape(upsampled_x)[0], ])
 
-    # fig_x = plt.figure(1)
-    # ax1 = fig_x.add_subplot(211)
-    # t = np.arange(0, time_head)
-    # ax1.plot(t[:100], x[:100],t[:100], y[:100],t[:100], z[:100])
-    # ax2 = fig_x.add_subplot(212)
-    # t2 = np.arange(0, time_head, (int(math.ceil(60 / frequency))*16 + 9) * 1.0 / 1000)
-    # ax2.plot(t2[:400], upsampled_x[:400],t2[:400], upsampled_y[:400],t2[:400], upsampled_z[:400])
-    # plt.show()
-    # raw_input("wait for input")
-
     return upsampled_x
 
 
@@ -82,7 +73,7 @@ if __name__ == "__main__":
         a = np.asarray(extractSpeechData(arg))
         b = np.empty([1, ])
         for n in range(1, len(a[0])):
-            c = upSampling(a[:, n], rate)
+            c = np.reshape(normalize(upSampling(a[:, n], rate)), (30,))
             b = np.column_stack((b, c))
         np.save(arg, b[:, 1:])
 
