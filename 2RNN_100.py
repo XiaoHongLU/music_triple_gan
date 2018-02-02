@@ -7,7 +7,7 @@ import os
 INPUT_DIMENSION = 39
 HIDDEN_DIMENSION = 100
 OUTPUT_DIMENSION = 10
-LEARNING_RATE = 0.03
+LEARNING_RATE = 0.1
 FRAME_WINDOW = 30
 EPOCH = 10000
 DISPLAY_EPOCH = 100
@@ -77,11 +77,11 @@ if not os.path.isfile(os.path.join(os.getcwd(),"Model/2RNN_100/2RNN_100.ckpt.met
         tf.logging.set_verbosity(tf.logging.DEBUG)
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
-        progress = open(os.path.join(os.getcwd(), 'Model/2RNN_100/2RNN_100.txt'), 'wb')
+        progress = open(os.path.join(os.getcwd(), 'Model/2RNN_100/2RNN_100.txt'), 'w')
         for step in range(EPOCH):
             feed_dict = {tf_train_data: data_train, tf_train_label: label_train}
             _, l, acc_train = session.run([optimizer, loss, acc], feed_dict=feed_dict)
-
+            print(step)
             if step % DISPLAY_EPOCH == 0:
                 loss_valid, predict_valid, acc_valid = session.run([loss, logits, acc], feed_dict={tf_train_data: data_valid,
                                                                                    tf_train_label: label_valid})
@@ -93,7 +93,7 @@ if not os.path.isfile(os.path.join(os.getcwd(),"Model/2RNN_100/2RNN_100.ckpt.met
                 progress.write('\n')
                 progress.write("step %d, validation : loss is %g" % (step, loss_valid))
                 progress.write('\n')
-
+                progress.flush()
         loss_test, predict_test = session.run([loss, logits],
                                          feed_dict={tf_train_data: data_test,
                                                     tf_train_label: label_test})
