@@ -25,8 +25,8 @@ def create_variables():
 
 
 # Load data
-X = np.load('Input/inputX.npy')
-Y = np.load('Label/inputy.npy')
+X = np.load('/home/s1679450/inputX.npy')
+Y = np.load('/home/s1679450/inputy.npy')
 
 data_train_valid, data_test, label_train_valid, label_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 data_train, data_valid, label_train, label_valid = train_test_split(data_train_valid, label_train_valid, test_size=0.3,
@@ -64,44 +64,44 @@ with graph.as_default():
 
     optimizer = tf.train.AdamOptimizer(LEARNING_RATE).minimize(loss)
 
-if not os.path.isfile(os.path.join(os.getcwd(),"Model/RNN_200/RNN_200.ckpt.meta")):
+if not os.path.isfile("/home/s1679450/RNN_200.ckpt.meta"):
     with tf.Session(graph=graph) as session:
         tf.logging.set_verbosity(tf.logging.DEBUG)
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
-        progress = open(os.path.join(os.getcwd(), 'Model/RNN_200/RNN_200.txt'), 'wb')
+        progress = open( '/home/s1679450/RNN_200.txt', 'w')
         for step in range(EPOCH):
             feed_dict = {tf_train_data: data_train, tf_train_label: label_train}
             _, l, acc_train = session.run([optimizer, loss, acc], feed_dict=feed_dict)
-
+            print("Step: " + str(step) + "\n")
             if step % DISPLAY_EPOCH == 0:
                 loss_valid, predict_valid, acc_valid = session.run([loss, logits, acc], feed_dict={tf_train_data: data_valid,
                                                                                    tf_train_label: label_valid})
                 print (acc_train[0])
                 #cc = np.corrcoef(predict_valid, label_valid)
-                print ("step %d, train : loss is %g" % (step, l))
-                print ("step %d, validation : loss is %g"%(step, loss_valid))
-                progress.write("step %d, train : loss is %g" % (step, l))
+                print ("step %s, train : loss is %s" % (step, l))
+                print ("step %s, validation : loss is %s"%(step, loss_valid))
+                progress.write("step %s, train : loss is %s" % (step, l))
                 progress.write('\n')
-                progress.write("step %d, validation : loss is %g" % (step, loss_valid))
+                progress.write("step %s, validation : loss is %s" % (step, loss_valid))
                 progress.write('\n')
 
         loss_test, predict_test = session.run([loss, logits],
                                          feed_dict={tf_train_data: data_test,
                                                     tf_train_label: label_test})
         #cc = np.corrcoef(label_test, predict_test)
-        print("test dataset : loss is %g" % loss_test)
-        progress.write("test dataset : loss is %g" % loss_test)
+        print("test dataset : loss is %s" % loss_test)
+        progress.write("test dataset : loss is %s" % loss_test)
         progress.write('\n')
 
         saver = tf.train.Saver()
-        saver.save(session, os.path.join(os.getcwd(), "Model/RNN_200/RNN_200.ckpt"))
+        saver.save(session, "/home/s1679450/RNN_200.ckpt")
 else:
     with tf.Session(graph=graph) as session:
         saver = tf.train.Saver()
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
 
-        saver.restore(session, os.path.join(os.getcwd(), 'Model/RNN_200/RNN_200.ckpt'))
+        saver.restore(session, '/home/s1679450/RNN_200.ckpt')
 
         predict = session.run([logits], feed_dict={tf_train_data: data_test, tf_train_label: label_test})
