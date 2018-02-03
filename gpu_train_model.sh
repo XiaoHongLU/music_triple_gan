@@ -36,4 +36,4 @@ export TMP=/disk/scratch/${STUDENT_ID}/
 source /home/${STUDENT_ID}/miniconda3/bin/activate mlp
 
 # Run the python script that will train our network
-python /home/s1679450/music_triple_gan/ 
+python /home/s1679450/music_triple_gan/lstm_keras.py 
