@@ -24,6 +24,7 @@ export PATH=${CUDA_HOME}/bin:${PATH}
 
 export PYTHON_PATH=$PATH
 
+export TASK_TAG=test
 # Setup a folder in the very fast scratch disk which can be used for storing experiment objects and any other files 
 # that may require storage during execution.
 mkdir -p /disk/scratch/${STUDENT_ID}
@@ -31,9 +32,11 @@ mkdir -p /disk/scratch/${STUDENT_ID}
 export TMPDIR=/disk/scratch/${STUDENT_ID}/
 export TMP=/disk/scratch/${STUDENT_ID}/
 
+export WORKDIR=/home/${STUDENT_ID}/music_triple_gan/Models/${TASK_TAG}
 # Activate the relevant virtual environment:
 
 source /home/${STUDENT_ID}/miniconda3/bin/activate mlp
 
+mkdir -p ${WORKDIR}
 # Run the python script that will train our network
-python /home/s1679450/music_triple_gan/lstm_keras.py 
+python /home/s1679450/music_triple_gan/lstm_keras.py ${WORKDIR}
