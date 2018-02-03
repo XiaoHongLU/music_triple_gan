@@ -21,7 +21,7 @@ input_shape = (data_train.shape[1], data_train.shape[2])
 print('Build LSTM RNN model ...')
 model = Sequential()
 
-model.add(Bidirectional(LSTM(units=100, dropout=0.05, recurrent_dropout=0.35, return_sequences=False)))
+model.add(Bidirectional(LSTM(units=200, dropout=0.05, recurrent_dropout=0.35, return_sequences=False)))
 model.add(Dense(units=10, activation='sigmoid'))
 
 print("Compiling ...")
@@ -32,4 +32,4 @@ print("Training ...")
 model.fit(data_train, label_train, batch_size=data_train.shape[0], epochs=nb_epochs, validation_data=(data_valid,label_valid))
 
 
-model.save('/home/s1569197/music_triple_gan/Model/rnn_100.h5')
+model.save('/home/s1569197/music_triple_gan/Model/rnn_200.h5')
