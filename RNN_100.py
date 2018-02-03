@@ -7,7 +7,7 @@ import os
 INPUT_DIMENSION = 39
 HIDDEN_DIMENSION = 100
 OUTPUT_DIMENSION = 10
-LEARNING_RATE = 0.03
+LEARNING_RATE = 0.3
 FRAME_WINDOW = 30
 EPOCH = 10000
 DISPLAY_EPOCH = 100
@@ -85,6 +85,7 @@ if not os.path.isfile(os.path.join(os.getcwd(),"Model/RNN_100/RNN_100.ckpt.meta"
                 progress.write('\n')
                 progress.write("step %d, validation : loss is %g" % (step, loss_valid))
                 progress.write('\n')
+		progress.flush()
 
         loss_test, predict_test = session.run([loss, logits],
                                          feed_dict={tf_train_data: data_test,
