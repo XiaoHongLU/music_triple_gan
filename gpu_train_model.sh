@@ -3,8 +3,8 @@
 #SBATCH -n 1      # tasks requested
 #SBATCH --gres=gpu:1 # use 4 GPU
 #SBATCH --mem=16000  # memory in Mb
-#SBATCH -o /home/s1679450/out.txt  # send stdout to outfile
-#SBATCH -e /home/s1679450/err.txt  # send stderr to errfile
+#SBATCH -o /home/s1569197/out.txt  # send stdout to outfile
+#SBATCH -e /home/s1569197/err.txt  # send stderr to errfile
 #SBATCH -t 00:50:00  # time requested in hour:minute:seconds
 
 # Setup CUDA and CUDNN related paths
@@ -12,7 +12,7 @@ export CUDA_HOME=/opt/cuda-8.0.44
 
 export CUDNN_HOME=/opt/cuDNN-6.0_8.0
 
-export STUDENT_ID=s1679450
+export STUDENT_ID=s1569197
 
 export LD_LIBRARY_PATH=${CUDNN_HOME}/lib64:${CUDA_HOME}/lib64:$LD_LIBRARY_PATH
 
@@ -36,4 +36,4 @@ export TMP=/disk/scratch/${STUDENT_ID}/
 source /home/${STUDENT_ID}/miniconda3/bin/activate mlp
 
 # Run the python script that will train our network
-python /home/s1679450/music_triple_gan/lstm_keras.py 
+python /home/s1569197/music_triple_gan/lstm_keras.py 
