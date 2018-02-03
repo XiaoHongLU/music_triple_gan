@@ -21,7 +21,7 @@ input_shape = (data_train.shape[1], data_train.shape[2])
 print('Build LSTM RNN model ...')
 model = Sequential()
 
-model.add(Bidirectional(LSTM(units=300, dropout=0.05, recurrent_dropout=0.35, return_sequences=False)))
+model.add(Bidirectional(LSTM(units=300, dropout=0.05, recurrent_dropout=0.35, return_sequences=False, input_shape=input_shape)))
 model.add(Dense(units=10, activation='sigmoid'))
 
 print("Compiling ...")
