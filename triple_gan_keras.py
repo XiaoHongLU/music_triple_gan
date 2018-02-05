@@ -1,9 +1,10 @@
 import os
 import sys
-from keras.models import Sequential
+from keras.models import Sequential, Model
 from keras import backend as K
 from keras.layers.recurrent import LSTM
-from keras.layers import Dense, Bidirectional, Input, Concatenate
+from keras.layers import Dense, Bidirectional, Input, Reshape
+from keras.layers import Lambda
 from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -25,6 +26,11 @@ print("classifier_layer_number : ",classifier_layer_number)
 
 opt = Adam()
 batch_size = 1000
+my_concat_1 = Lambda(lambda x: K.concatenate([x[0], x[1]], axis=1))
+my_concat_2 = Lambda(lambda x: K.concatenate([x[0], x[1]], axis=2))
+my_reshape = Lambda(lambda x: K.reshape(x, (1, 1170)))
+my_reshape_10 = Lambda(lambda x: K.reshape(x, (1, 10)))
+my_reshape_3 = Lambda(lambda x: K.reshape(x, (1, 1180)))
 
 
 X = np.load('Input/inputX.npy')
@@ -33,7 +39,7 @@ data_train_valid, data_test, label_train_valid, label_test = train_test_split(X,
 data_train, data_valid, label_train, label_valid = train_test_split(data_train_valid, label_train_valid, test_size=0.3,
                                                                     random_state=42)
 
-gen_input_shape = (data_train.shape[1], data_train.shape[2]+data_train.shape[2])
+gen_input_shape = (data_train.shape[1], data_train.shape[2] + data_train.shape[2])
 print('Build LSTM RNN model ...')
 gen = Sequential()
 for i in range(gen_layer_number):
@@ -47,7 +53,7 @@ for i in range(gen_layer_number):
 		gen.add(Bidirectional(LSTM(units=gen_hidden_unit_num, dropout=0.05, recurrent_dropout=0.35, return_sequences=True)))
 gen.add(Dense(units=10, activation='sigmoid'))
 
-disc_input_shape = (1180)
+disc_input_shape = (1, 1180)
 disc = Sequential()
 for i in range(disc_layer_number):
 	if (i == 0 and disc_layer_number > 1):
@@ -60,7 +66,7 @@ for i in range(disc_layer_number):
 		disc.add(Bidirectional(LSTM(units=disc_hidden_unit_num, dropout=0.05, recurrent_dropout=0.35, return_sequences=True)))
 disc.add(Dense(units=1, activation='sigmoid'))
 
-classifier_input_shape = (10)
+classifier_input_shape = (1, 10)
 classifier = Sequential()
 for i in range(classifier_layer_number):
 	if (i == 0 and classifier_layer_number > 1):
@@ -71,32 +77,36 @@ for i in range(classifier_layer_number):
 		classifier.add(Bidirectional(LSTM(units=classifier_hidden_unit_num, dropout=0.05, recurrent_dropout=0.35, return_sequences=False)))
 	else:
 		classifier.add(Bidirectional(LSTM(units=classifier_hidden_unit_num, dropout=0.05, recurrent_dropout=0.35, return_sequences=True)))
-classifier.add(Dense(units=(30,39), activation='sigmoid'))
+classifier.add(Dense(units=1170, activation='elu'))
+classifier.add(Reshape((30, 39)))
 
-#Build combined model gen_disc
+
+# Build combined model gen_disc
 disc.trainable = False
 z = Input(shape=(data_train.shape[1], data_train.shape[2]))
 y = Input(shape=(data_train.shape[1], data_train.shape[2]))
-comined = Concatenate((z,y), axis=1)
-generated_label = gen(z)
-flatten_y = K.reshape(y, (data_train.shape[1]*data_train.shape[2]))
-generated_label_speech = Concatenate((generated_label, flatten_y), axis=1)
+combined = my_concat_2([z, y])
+generated_label = my_reshape_10(gen(combined))
+flatten_y = my_reshape(y)
+generated_label_speech = my_concat_1([generated_label, flatten_y])
 disc_fake = disc(generated_label_speech)
-gen_disc = Model((z,y), disc_fake)
+gen_disc = Model((z, y), disc_fake)
 
-#Build combined model classifier_disc
+
+# Build combined model classifier_disc
 disc.trainable = False
-x = Input(shape=(10))
-generated_speech_ = classifier(x)
-generated_label_speech_ = Concatenate((x, generated_speech_), axis=1)
+x = Input(shape=(1, 10))
+generated_speech_ = my_reshape(classifier(x))
+generated_label_speech_ = my_concat_1([my_reshape_10(x), generated_speech_])
 disc_unlabel = disc(generated_label_speech)
 cla_disc = Model(x, disc_unlabel)
 
-#Build combined model classifier_gen_disc
+
+# Build combined model classifier_gen_disc
 disc.trainable = False
 gen.trainable = False
 disc_cla = cla_disc(generated_label)
-cla_gen_disc = Model((z,y), disc_cla)
+cla_gen_disc = Model((z, y), disc_cla)
 
 
 print("Compiling ...")
@@ -104,7 +114,7 @@ gen.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 gen.summary()
 disc.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 disc.summary()
-classifier.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
+classifier.compile(loss='mean_squared_error', optimizer=opt, metrics=['accuracy'])
 classifier.summary()
 gen_disc.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 cla_disc.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
@@ -112,48 +122,49 @@ cla_gen_disc.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accura
 
 print("Training ...")
 for epoch in range(nb_epochs):
-	#Train Discriminator
-	noise = np.random.normal(0, 1, (batch_size, data_train.shape[1], data_train.shape[2]))
-	idx = np.random.randint(0, data_train.shape[0], batch_size)
-	real_data_reshaped = np.reshape(data_train[idx],(batch_size, -1))
-	idx_valid = np.random.randint(0, data_valid.shape[0], batch_size)
-	unlabel = label_valid[idx_valid]
-	unlabel_data = data_valid[idx_valid]
-	real_label = label_train[idx]
+        # Train Discriminator
+        noise = np.random.normal(0, 1, (batch_size, data_train.shape[1], data_train.shape[2]))
+        idx = np.random.randint(0, data_train.shape[0], batch_size)
+        real_data = data_train[idx]
+        noise_real_data = np.concatenate((noise, real_data), axis=2)
+        real_data_reshaped = np.reshape(real_data, (batch_size, -1))
+        idx_valid = np.random.randint(0, data_valid.shape[0], batch_size)
+        unlabel = label_valid[idx_valid]
+        unlabel_data = data_valid[idx_valid]
+        real_label = label_train[idx]
 
+        gen_label = gen(noise_real_data)
+        fake_ = np.reshape(np.concatenate((gen_label, real_data_reshaped), axis=1), (batch_size, 1, 1180))
+        real_ = np.reshape(np.concatenate((real_label, real_data_reshaped), axis=1), (batch_size, 1, 1180))
 
-	gen_label = gen(noise)
-	fake_ = np.concatenate((gen_label, real_data), axis=1)
-	real_ = np.concatenate((real_label, real_data), axis=1)
+        d_loss_fake = disc.train_on_batch(fake_, np.zeros((batch_size, 1)))
+        d_loss_real = disc.train_on_batch(real_, np.ones((batch_size, 1)))
+        d_loss_cla = cla_disc.train_on_batch(unlabel, np.zeros((batch_size, 1)))
+        d_loss = np.add(np.add(d_loss_real, d_loss_fake), d_loss_cla)
 
-	d_loss_fake = disc.train_on_batch(fake_, np.zeros((batch_size, 1)))
-	d_loss_real = disc.train_on_batch(real_, np.ones((batch_size, 1)))
-	d_loss_cla = cla_disc.train_on_batch(unlabel, np.zeros((batch_size, 1)))
-	d_loss = np.add(np.add(d_loss_real, d_loss_fake), d_loss_cla)
+        # Train Generator
+        valid_y = np.array([1] * batch_size)
 
-	#Train Generator
-	real_data = data_train[idx]
-	valid_y = np.array([1] * batch_size)
+        g_loss = gen_disc.train_on_batch((noise, real_data), valid_y)
 
-	g_loss = gen_disc.train_on_batch((noise, real_data), valid_y)
+        # Train Classifier
+        R_L = classifier.train_on_batch(real_label, real_data)
+        R_P = cla_gen_disc.train_on_batch((noise, real_data), valid_y)
+        c_loss_dis = cla_disc.train_on_batch(unlabel, unlabel_data)
+        c_loss = R_L + R_P + c_loss_dis
+        print d_loss
+        print g_loss
+        print c_loss
 
-	#Train Classifier
-	R_L = classifier.train_on_batch(real_label, real_data)
-	R_P = cla_gen_disc.train_on_batch((noise, real_data), valid_y)
-	c_loss_dis = cla_disc.train_on_batch(unlabel, unlabel_data)
-	c_loss = R_L + R_P + c_loss_dis
-
-
-
-file_gen_history = open(working_folder+"/gen_history.json","w")
-file_gen_history.write(json.dumps(gen_history.history))
-file_gen_history.close()
-file_disc_history = open(working_folder+"/disc_history.json","w")
-file_disc_history.write(json.dumps(disc_history.history))
-file_disc_history.close()
-file_classifier_history = open(working_folder+"/classifier_history.json","w")
-file_classifier_history.write(json.dumps(classifier_history.history))
-file_classifier_history.close()
+# file_gen_history = open(working_folder+"/gen_history.json","w")
+# file_gen_history.write(json.dumps(gen_history.history))
+# file_gen_history.close()
+# file_disc_history = open(working_folder+"/disc_history.json","w")
+# file_disc_history.write(json.dumps(disc_history.history))
+# file_disc_history.close()
+# file_classifier_history = open(working_folder+"/classifier_history.json","w")
+# file_classifier_history.write(json.dumps(classifier_history.history))
+# file_classifier_history.close()
 
 gen.save(working_folder+'/gen_model.h5')
 disc.save(working_folder+'/disc_model.h5')
