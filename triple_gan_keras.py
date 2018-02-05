@@ -26,11 +26,14 @@ print("classifier_layer_number : ",classifier_layer_number)
 
 opt = Adam()
 batch_size = 1000
-my_concat_1 = Lambda(lambda x: K.concatenate([x[0], x[1]], axis=1))
+alpha_cla_adv = 0.01
+alpha = 0.5
+apply_epoch = 10
+my_concat_1 = Lambda(lambda x: K.concatenate([x[0], x[1]], axis=2))
 my_concat_2 = Lambda(lambda x: K.concatenate([x[0], x[1]], axis=2))
-my_reshape = Lambda(lambda x: K.reshape(x, (1, 1170)))
-my_reshape_10 = Lambda(lambda x: K.reshape(x, (1, 10)))
-my_reshape_3 = Lambda(lambda x: K.reshape(x, (1, 1180)))
+my_reshape = Lambda(lambda x: K.reshape(x, (K.shape(x)[0], 1, 1170)))
+my_reshape_10 = Lambda(lambda x: K.reshape(x, (K.shape(x)[0], 1, 10)))
+my_reshape_3 = Lambda(lambda x: K.reshape(x, (1, 1, 1180)))
 
 
 X = np.load('Input/inputX.npy')
@@ -90,7 +93,7 @@ generated_label = my_reshape_10(gen(combined))
 flatten_y = my_reshape(y)
 generated_label_speech = my_concat_1([generated_label, flatten_y])
 disc_fake = disc(generated_label_speech)
-gen_disc = Model((z, y), disc_fake)
+gen_disc = Model([z, y], disc_fake)
 
 
 # Build combined model classifier_disc
@@ -98,7 +101,7 @@ disc.trainable = False
 x = Input(shape=(1, 10))
 generated_speech_ = my_reshape(classifier(x))
 generated_label_speech_ = my_concat_1([my_reshape_10(x), generated_speech_])
-disc_unlabel = disc(generated_label_speech)
+disc_unlabel = disc(generated_label_speech_)
 cla_disc = Model(x, disc_unlabel)
 
 
@@ -106,7 +109,7 @@ cla_disc = Model(x, disc_unlabel)
 disc.trainable = False
 gen.trainable = False
 disc_cla = cla_disc(generated_label)
-cla_gen_disc = Model((z, y), disc_cla)
+cla_gen_disc = Model([z, y], disc_cla)
 
 
 print("Compiling ...")
@@ -122,6 +125,10 @@ cla_gen_disc.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accura
 
 print("Training ...")
 for epoch in range(nb_epochs):
+        if epoch >= apply_epoch:
+            alpha_p = 0.1
+        else:
+            alpha_p = 0.0
         # Train Discriminator
         noise = np.random.normal(0, 1, (batch_size, data_train.shape[1], data_train.shape[2]))
         idx = np.random.randint(0, data_train.shape[0], batch_size)
@@ -129,32 +136,32 @@ for epoch in range(nb_epochs):
         noise_real_data = np.concatenate((noise, real_data), axis=2)
         real_data_reshaped = np.reshape(real_data, (batch_size, -1))
         idx_valid = np.random.randint(0, data_valid.shape[0], batch_size)
-        unlabel = label_valid[idx_valid]
+        unlabel = np.reshape(label_valid[idx_valid], (batch_size, 1, 10))
         unlabel_data = data_valid[idx_valid]
-        real_label = label_train[idx]
+        real_label = np.reshape(label_train[idx], (batch_size, 1, 10))
 
-        gen_label = gen(noise_real_data)
+        gen_label = gen.predict(noise_real_data)
         fake_ = np.reshape(np.concatenate((gen_label, real_data_reshaped), axis=1), (batch_size, 1, 1180))
-        real_ = np.reshape(np.concatenate((real_label, real_data_reshaped), axis=1), (batch_size, 1, 1180))
+        real_ = np.concatenate((real_label, np.reshape(real_data, (batch_size, 1, 1170))), axis=2)
 
         d_loss_fake = disc.train_on_batch(fake_, np.zeros((batch_size, 1)))
         d_loss_real = disc.train_on_batch(real_, np.ones((batch_size, 1)))
         d_loss_cla = cla_disc.train_on_batch(unlabel, np.zeros((batch_size, 1)))
-        d_loss = np.add(np.add(d_loss_real, d_loss_fake), d_loss_cla)
+        d_loss = np.add(np.add(d_loss_real, d_loss_fake), d_loss_cla) / 3
 
         # Train Generator
-        valid_y = np.array([1] * batch_size)
+        valid_y = np.reshape(np.array([1] * batch_size), (batch_size, 1))
 
-        g_loss = gen_disc.train_on_batch((noise, real_data), valid_y)
+        g_loss = gen_disc.train_on_batch([noise, real_data], valid_y)
 
         # Train Classifier
         R_L = classifier.train_on_batch(real_label, real_data)
-        R_P = cla_gen_disc.train_on_batch((noise, real_data), valid_y)
-        c_loss_dis = cla_disc.train_on_batch(unlabel, unlabel_data)
-        c_loss = R_L + R_P + c_loss_dis
-        print d_loss
-        print g_loss
-        print c_loss
+        R_P = classifier.train_on_batch(np.reshape(gen_label, (batch_size, 1, 10)), real_data)
+        c_loss_dis = cla_disc.train_on_batch(unlabel, valid_y)
+        c_loss = np.add(np.add(R_L, np.multiply(alpha_p, R_P)), np.multiply(alpha_cla_adv,
+                                                                            np.multiply(alpha, c_loss_dis)))
+        print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f], [C loss: %f]" %
+               (epoch, d_loss[0], 100 * d_loss[1], g_loss[0], c_loss[0]))
 
 # file_gen_history = open(working_folder+"/gen_history.json","w")
 # file_gen_history.write(json.dumps(gen_history.history))
