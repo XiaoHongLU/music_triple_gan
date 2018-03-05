@@ -234,7 +234,7 @@ if not os.path.isfile(os.path.join(os.getcwd(), "Model/Triple_GAN_RNN_G2_D2_C1/T
         tf.logging.set_verbosity(tf.logging.DEBUG)
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
-        progress = open(os.path.join(os.getcwd(), 'Model/Triple_GAN_RNN_G2_D2_C1/Triple_GAN_RNN_G2_D2_C1.txt'), 'wb')
+        progress = open(os.path.join(os.getcwd(), 'Model/Triple_GAN_RNN_G2_D2_C1/Triple_GAN_RNN_G2_D2_C1.txt'), 'w')
         for step in range(EPOCH):
             train_noise = np.random.uniform(-1, 1, size=[train_batch_size, FRAME_WINDOW, INPUT_DIMENSION])
             feed_dict = {tf_noise: train_noise, tf_train_data: data_train, tf_train_label: label_train,
