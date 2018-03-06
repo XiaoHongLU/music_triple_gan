@@ -3,16 +3,16 @@
 #SBATCH -n 1      # tasks requested
 #SBATCH --gres=gpu:1 # use 4 GPU
 #SBATCH --mem=16000  # memory in Mb
-#SBATCH -o /home/s1679450/out.txt  # send stdout to outfile
-#SBATCH -e /home/s1679450/err.txt  # send stderr to errfile
-#SBATCH -t 10:50:00  # time requested in hour:minute:seconds
+#SBATCH -o /home/s1569197/out.txt  # send stdout to outfile
+#SBATCH -e /home/s1569197/err.txt  # send stderr to errfile
+#SBATCH -t 08:00:00  # time requested in hour:minute:seconds
 
 # Setup CUDA and CUDNN related paths
 export CUDA_HOME=/opt/cuda-8.0.44
 
 export CUDNN_HOME=/opt/cuDNN-6.0_8.0
 
-export STUDENT_ID=s1679450
+export STUDENT_ID=s1569197
 
 export LD_LIBRARY_PATH=${CUDNN_HOME}/lib64:${CUDA_HOME}/lib64:$LD_LIBRARY_PATH
 

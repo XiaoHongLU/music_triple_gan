@@ -1,3 +1,4 @@
 *.e*
 *.o*
 *.npy
+gpu_train_model_tf.sh
