@@ -234,6 +234,7 @@ if not os.path.isfile(os.path.join(os.getcwd(), "Model/Triple_GAN_RNN_G1_D2_C2/T
         tf.logging.set_verbosity(tf.logging.DEBUG)
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
+        saver = tf.train.Saver()
         progress = open(os.path.join(os.getcwd(), 'Model/Triple_GAN_RNN_G1_D2_C2/Triple_GAN_RNN_G1_D2_C2.txt'), 'w')
         for step in range(EPOCH):
             train_noise = np.random.uniform(-1, 1, size=[train_batch_size, FRAME_WINDOW, INPUT_DIMENSION])
@@ -251,8 +252,9 @@ if not os.path.isfile(os.path.join(os.getcwd(), "Model/Triple_GAN_RNN_G1_D2_C2/T
                 progress.write("step %d, train : gen_loss is %g, disc_loss is %g,, cls_loss is %g" % (step, gen_l,
                                                                                                      disc_l, cls_l))
                 progress.write('\n')
+                saver.save(session,
+                           os.path.join(os.getcwd(), "Model/Triple_GAN_RNN_G1_D2_C2/Triple_GAN_RNN_G1_D2_C2_"+str(step)+".ckpt"))
 
-        saver = tf.train.Saver()
         saver.save(session, os.path.join(os.getcwd(), "Model/Triple_GAN_RNN_G1_D2_C2/Triple_GAN_RNN_G1_D2_C2.ckpt"))
         test_noise = np.random.uniform(-1, 1, size=[test_batch_size, FRAME_WINDOW, INPUT_DIMENSION])
         disc_loss_test, gen_loss_test, cls_loss_test = session.run([disc_loss, gen_loss, cls_loss], feed_dict={tf_noise: test_noise,
