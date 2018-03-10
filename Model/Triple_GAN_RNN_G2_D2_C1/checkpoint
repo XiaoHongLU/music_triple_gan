@@ -1,2 +1,6 @@
 model_checkpoint_path: "/mnt/mscteach_home/s1569197/music_triple_gan/Model/Triple_GAN_RNN_G2_D2_C1/Triple_GAN_RNN_G2_D2_C1.ckpt"
+all_model_checkpoint_paths: "/mnt/mscteach_home/s1569197/music_triple_gan/Model/Triple_GAN_RNN_G2_D2_C1/Triple_GAN_RNN_G2_D2_C1_960.ckpt"
+all_model_checkpoint_paths: "/mnt/mscteach_home/s1569197/music_triple_gan/Model/Triple_GAN_RNN_G2_D2_C1/Triple_GAN_RNN_G2_D2_C1_970.ckpt"
+all_model_checkpoint_paths: "/mnt/mscteach_home/s1569197/music_triple_gan/Model/Triple_GAN_RNN_G2_D2_C1/Triple_GAN_RNN_G2_D2_C1_980.ckpt"
+all_model_checkpoint_paths: "/mnt/mscteach_home/s1569197/music_triple_gan/Model/Triple_GAN_RNN_G2_D2_C1/Triple_GAN_RNN_G2_D2_C1_990.ckpt"
 all_model_checkpoint_paths: "/mnt/mscteach_home/s1569197/music_triple_gan/Model/Triple_GAN_RNN_G2_D2_C1/Triple_GAN_RNN_G2_D2_C1.ckpt"
