@@ -64,10 +64,10 @@ def generator(inputs, conditional, variables, reuse=False):
         with tf.variable_scope('gen_layer1') as scope:
             # Forward direction cell
             lstm_fw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-                                                         input_keep_prob=0.5, state_keep_prob=0.35)
+                                                         input_keep_prob=0.05, state_keep_prob=0.35)
             # Backward direction cell
             lstm_bw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-                                                         input_keep_prob=0.5, state_keep_prob=0.35)
+                                                         input_keep_prob=0.05, state_keep_prob=0.35)
 
             rnn1_outputs, _, _ = rnn.static_bidirectional_rnn(lstm_fw_cell, lstm_bw_cell, inputs, dtype=tf.float32,
                                                               scope=scope)
@@ -75,11 +75,11 @@ def generator(inputs, conditional, variables, reuse=False):
         # with tf.variable_scope('gen_layer2') as scope1:
         #     # Forward direction cell
         #     lstm2_fw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-        #                                                  input_keep_prob=0.5, state_keep_prob=0.35)
+        #                                                  input_keep_prob=0.05, state_keep_prob=0.35)
 
         #     # Backward direction cell
         #     lstm2_bw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-        #                                                  input_keep_prob=0.5, state_keep_prob=0.35)
+        #                                                  input_keep_prob=0.05, state_keep_prob=0.35)
 
         #     rnn2_outputs, _, _ = rnn.static_bidirectional_rnn(lstm2_fw_cell, lstm2_bw_cell, rnn1_outputs,
         #                                                       dtype=tf.float32,
@@ -100,10 +100,10 @@ def discriminator(inputs, conditional, variables, reuse=False):
         with tf.variable_scope('disc_layer1') as scope:
             # Forward direction cell
             lstm_fw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-                                                         input_keep_prob=0.5, state_keep_prob=0.35)
+                                                         input_keep_prob=0.05, state_keep_prob=0.35)
             # Backward direction cell
             lstm_bw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-                                                         input_keep_prob=0.5, state_keep_prob=0.35)
+                                                         input_keep_prob=0.05, state_keep_prob=0.35)
 
             rnn1_outputs, _, _ = rnn.static_bidirectional_rnn(lstm_fw_cell, lstm_bw_cell, inputs, dtype=tf.float32,
                                                               scope=scope)
@@ -111,11 +111,11 @@ def discriminator(inputs, conditional, variables, reuse=False):
         with tf.variable_scope('disc_layer2') as scope1:
             # Forward direction cell
             lstm2_fw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-                                                         input_keep_prob=0.5, state_keep_prob=0.35)
+                                                         input_keep_prob=0.05, state_keep_prob=0.35)
         
             # Backward direction cell
             lstm2_bw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-                                                         input_keep_prob=0.5, state_keep_prob=0.35)
+                                                         input_keep_prob=0.05, state_keep_prob=0.35)
         
             rnn2_outputs, _, _ = rnn.static_bidirectional_rnn(lstm2_fw_cell, lstm2_bw_cell, rnn1_outputs,
                                                               dtype=tf.float32,
@@ -135,10 +135,10 @@ def classifier(inputs, variables, reuse=False):
         with tf.variable_scope('cls_layer1') as scope:
             # Forward direction cell
             lstm_fw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-                                                         input_keep_prob=0.5, state_keep_prob=0.35)
+                                                         input_keep_prob=0.05, state_keep_prob=0.35)
             # Backward direction cell
             lstm_bw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-                                                         input_keep_prob=0.5, state_keep_prob=0.35)
+                                                         input_keep_prob=0.05, state_keep_prob=0.35)
 
             rnn1_outputs, _, _ = rnn.static_bidirectional_rnn(lstm_fw_cell, lstm_bw_cell, inputs, dtype=tf.float32,
                                                               scope=scope)
@@ -146,11 +146,11 @@ def classifier(inputs, variables, reuse=False):
         # with tf.variable_scope('cls_layer2') as scope1:
         #     # Forward direction cell
         #     lstm2_fw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-        #                                                  input_keep_prob=0.5, state_keep_prob=0.35)
+        #                                                  input_keep_prob=0.05, state_keep_prob=0.35)
 
         #     # Backward direction cell
         #     lstm2_bw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-        #                                                  input_keep_prob=0.5, state_keep_prob=0.35)
+        #                                                  input_keep_prob=0.05, state_keep_prob=0.35)
 
         #     rnn2_outputs, _, _ = rnn.static_bidirectional_rnn(lstm2_fw_cell, lstm2_bw_cell, rnn1_outputs,
         #                                                       dtype=tf.float32,
