@@ -121,18 +121,18 @@ def discriminator(inputs, conditional, variables, reuse=False):
             rnn1_outputs, _, _ = rnn.static_bidirectional_rnn(lstm_fw_cell, lstm_bw_cell, inputs, dtype=tf.float32,
                                                               scope=scope)
 
-        # with tf.variable_scope('disc_layer2') as scope1:
-        #     # Forward direction cell
-        #     lstm2_fw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-        #                                                  input_keep_prob=0.05, state_keep_prob=0.35)
+        with tf.variable_scope('disc_layer2') as scope1:
+            # Forward direction cell
+            lstm2_fw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
+                                                         input_keep_prob=0.05, state_keep_prob=0.35)
         
-        #     # Backward direction cell
-        #     lstm2_bw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
-        #                                                  input_keep_prob=0.05, state_keep_prob=0.35)
+            # Backward direction cell
+            lstm2_bw_cell = rnn.DropoutWrapper(rnn.BasicLSTMCell(HIDDEN_DIMENSION, forget_bias=1.0),
+                                                         input_keep_prob=0.05, state_keep_prob=0.35)
         
-        #     rnn2_outputs, _, _ = rnn.static_bidirectional_rnn(lstm2_fw_cell, lstm2_bw_cell, rnn1_outputs,
-        #                                                       dtype=tf.float32,
-        #                                                       scope=scope1)
+            rnn2_outputs, _, _ = rnn.static_bidirectional_rnn(lstm2_fw_cell, lstm2_bw_cell, rnn1_outputs,
+                                                              dtype=tf.float32,
+                                                              scope=scope1)
 
     return tf.nn.sigmoid(tf.matmul(rnn2_outputs[-1], variables['disc_w1_lstm']) + variables['disc_b1_lstm'])
 

@@ -145,7 +145,7 @@ def discriminator(inputs, conditional, variables, reuse=False):
         
             rnn3_outputs, _, _ = rnn.static_bidirectional_rnn(lstm3_fw_cell, lstm3_bw_cell, rnn2_outputs,
                                                               dtype=tf.float32,
-                                                              scope=scope1)
+                                                              scope=scope2)
 
     return tf.nn.sigmoid(tf.matmul(rnn3_outputs[-1], variables['disc_w1_lstm']) + variables['disc_b1_lstm'])
 
@@ -193,7 +193,7 @@ def classifier(inputs, variables, reuse=False):
 
             rnn3_outputs, _, _ = rnn.static_bidirectional_rnn(lstm3_fw_cell, lstm3_bw_cell, rnn2_outputs,
                                                               dtype=tf.float32,
-                                                              scope=scope1)
+                                                              scope=scope2)
 
     return tf.matmul(rnn3_outputs[-1], variables['cls_w1_lstm']) + variables['cls_b1_lstm']
 
