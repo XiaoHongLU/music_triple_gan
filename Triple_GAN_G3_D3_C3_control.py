@@ -270,12 +270,12 @@ with graph.as_default():
     with tf.control_dependencies(cls_update_ops):
         optimizer_cls = tf.train.AdamOptimizer(LEARNING_RATE).minimize(cls_loss, var_list=cls_vars)
 
-if not os.path.isfile(os.path.join(os.getcwd(), "Model/Triple_GAN_RNN_G3_D3_C3/Triple_GAN_RNN_G3_D3_C3.ckpt.meta")):
+if not os.path.isfile(os.path.join(os.getcwd(), "Model/Triple_GAN_RNN_G3_D3_C3_control/Triple_GAN_RNN_G3_D3_C3_control.ckpt.meta")):
     with tf.Session(graph=graph) as session:
         tf.logging.set_verbosity(tf.logging.DEBUG)
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
-        progress = open(os.path.join(os.getcwd(), 'Model/Triple_GAN_RNN_G3_D3_C3/Triple_GAN_RNN_G3_D3_C3.txt'), 'w')
+        progress = open(os.path.join(os.getcwd(), 'Model/Triple_GAN_RNN_G3_D3_C3_control/Triple_GAN_RNN_G3_D3_C3_control.txt'), 'w')
         for step in range(EPOCH):
             train_noise = np.random.uniform(-1, 1, size=[train_batch_size, FRAME_WINDOW, INPUT_DIMENSION])
             feed_dict = {tf_noise: train_noise, tf_train_data: data_train, tf_train_label: label_train,
@@ -294,7 +294,7 @@ if not os.path.isfile(os.path.join(os.getcwd(), "Model/Triple_GAN_RNN_G3_D3_C3/T
                 progress.write('\n')
 
         saver = tf.train.Saver()
-        saver.save(session, os.path.join(os.getcwd(), "Model/Triple_GAN_RNN_G3_D3_C3/Triple_GAN_RNN_G3_D3_C3.ckpt"))
+        saver.save(session, os.path.join(os.getcwd(), "Model/Triple_GAN_RNN_G3_D3_C3_control/Triple_GAN_RNN_G3_D3_C3_control.ckpt"))
         test_noise = np.random.uniform(-1, 1, size=[test_batch_size, FRAME_WINDOW, INPUT_DIMENSION])
         disc_loss_test, gen_loss_test, cls_loss_test = session.run([disc_loss, gen_loss, cls_loss], feed_dict={tf_noise: test_noise,
                                                                                       tf_train_data: data_test,
@@ -316,7 +316,7 @@ else:
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
 
-        saver.restore(session, os.path.join(os.getcwd(), 'Model/Triple_GAN_RNN_G3_D3_C3/Triple_GAN_RNN_G3_D3_C3.ckpt'))
+        saver.restore(session, os.path.join(os.getcwd(), 'Model/Triple_GAN_RNN_G3_D3_C3_control/Triple_GAN_RNN_G3_D3_C3_control.ckpt'))
 
         train_noise = np.random.uniform(-1., 1., size=[train_batch_size, FRAME_WINDOW, INPUT_DIMENSION])
         test_noise = np.random.uniform(-1., 1., size=[test_batch_size, FRAME_WINDOW, INPUT_DIMENSION])
