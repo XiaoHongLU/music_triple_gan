@@ -1,6 +1,0 @@
-model_checkpoint_path: "/afs/inf.ed.ac.uk/user/s15/s1569197/Desktop/music_triple_gan/Model/Triple_GAN_RNN_G1_D1_C1_control/Triple_GAN_RNN_G1_D1_C1_control.ckpt"
-all_model_checkpoint_paths: "/afs/inf.ed.ac.uk/user/s15/s1569197/Desktop/music_triple_gan/Model/Triple_GAN_RNN_G1_D1_C1_control/Triple_GAN_RNN_G1_D1_C1_control_960.ckpt"
-all_model_checkpoint_paths: "/afs/inf.ed.ac.uk/user/s15/s1569197/Desktop/music_triple_gan/Model/Triple_GAN_RNN_G1_D1_C1_control/Triple_GAN_RNN_G1_D1_C1_control_970.ckpt"
-all_model_checkpoint_paths: "/afs/inf.ed.ac.uk/user/s15/s1569197/Desktop/music_triple_gan/Model/Triple_GAN_RNN_G1_D1_C1_control/Triple_GAN_RNN_G1_D1_C1_control_980.ckpt"
-all_model_checkpoint_paths: "/afs/inf.ed.ac.uk/user/s15/s1569197/Desktop/music_triple_gan/Model/Triple_GAN_RNN_G1_D1_C1_control/Triple_GAN_RNN_G1_D1_C1_control_990.ckpt"
-all_model_checkpoint_paths: "/afs/inf.ed.ac.uk/user/s15/s1569197/Desktop/music_triple_gan/Model/Triple_GAN_RNN_G1_D1_C1_control/Triple_GAN_RNN_G1_D1_C1_control.ckpt"

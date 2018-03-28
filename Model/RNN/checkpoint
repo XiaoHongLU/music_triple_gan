@@ -1,2 +1,0 @@
-model_checkpoint_path: "/mnt/mscteach_home/s1569197/music_triple_gan/Model/RNN/RNN.ckpt"
-all_model_checkpoint_paths: "/mnt/mscteach_home/s1569197/music_triple_gan/Model/RNN/RNN.ckpt"
